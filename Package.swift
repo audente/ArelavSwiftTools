@@ -12,12 +12,14 @@ let package = Package(
     platforms: [
         .iOS("18.1")
     ],
+    
     products: [
         .library(
             name: "ArelavSwiftTools",
             targets: ["ArelavSwiftTools"]
         )
     ],
+    
     targets: [
         .target(
             name: "ArelavSwiftTools",
