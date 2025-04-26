@@ -1,4 +1,4 @@
-import Swift
+import Foundation
 
 
 public struct Log {

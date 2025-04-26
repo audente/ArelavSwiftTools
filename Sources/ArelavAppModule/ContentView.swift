@@ -12,9 +12,9 @@ struct ContentView: View {
                 .foregroundColor(.accentColor)
             Text("Hello, \(name)!")
             Button("Change") {
-                name = GetText()
+                name = "there"
                 var logger = Log.shared
-                logger.logLevel = .Info
+                logger.logLevel = .Debug
                 logger.Debug(msg: "Hi")
             }
         }
