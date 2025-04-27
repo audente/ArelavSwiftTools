@@ -4,8 +4,8 @@ import Foundation
 // ------------------------------------------------------------------
 
 public struct ErrorObject: Decodable {
-    let id: String?
-    let message: String
+    public let id: String?
+    public let message: String
 }
 
 public enum RequestMethod: String {
@@ -119,7 +119,7 @@ public extension Endpoint {
 // ------------------------------------------------------------------
 
 public protocol HTTPClient {
-    func sendRequest<T: Decodable>(endpoint: Endpoint, responseModel: T.Type) async -> Result<T, RequestError>
+    func sendRequest<T: Decodable>(endpoint: Endpoint, responseModel: T.Type, decoder: ((Data) -> String?)?) async -> Result<T, RequestError>
 }
 
 
@@ -159,11 +159,14 @@ public extension HTTPClient {
             default:
                 Log.shared.Debug(msg: "HTTP Error \(response.statusCode)", detail: "\(response)")
                 var errorStr = String(data: data, encoding: .utf8) ?? ""
+                Log.shared.Debug(msg: "Plain Error", detail: errorStr)
                 
                 if let decoder, let msg = decoder(data) {
                     errorStr = msg
+                    Log.shared.Debug(msg: "Custom decoder", detail: errorStr)
                 } else if let errorObj = try? JSONDecoder().decode(ErrorObject.self, from: data) {
                     errorStr = "\(errorObj.message)\n(\(errorObj.id ?? "No ID"))"
+                    Log.shared.Debug(msg: "Default decoder", detail: errorStr)
                 }
                 
                 return .failure(.statusCode("\(HTTPURLResponse.localizedString(forStatusCode: response.statusCode).capitalized)\n \(errorStr)"))

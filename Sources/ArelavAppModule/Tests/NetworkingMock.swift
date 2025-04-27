@@ -55,17 +55,26 @@ protocol MockAPIServicesProtocol {
 
 struct MockAPIServices: MockAPIServicesProtocol, HTTPClient {
     
+    func customDecodeError(data: Data) -> String? {
+        guard let errorObj = try? JSONDecoder().decode(ErrorObject.self, from: data) else {
+            return nil
+        }
+        return errorObj.message
+    }
+    
     func getUsers() async -> Result<[MockAPIEcho], RequestError> {
         return await sendRequest(
             endpoint: MockAPIEndpoints.echo, 
-            responseModel: [MockAPIEcho].self
+            responseModel: [MockAPIEcho].self,
+            decoder: customDecodeError
         )
     }
     
     func getUser(id: Int) async -> Result<MockAPIEcho, RequestError> {
         return await sendRequest(
             endpoint: MockAPIEndpoints.echoID(id), 
-            responseModel: MockAPIEcho.self
+            responseModel: MockAPIEcho.self,
+            decoder: customDecodeError
         )
     }
 }
