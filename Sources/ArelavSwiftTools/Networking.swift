@@ -126,7 +126,8 @@ public protocol HTTPClient {
 public extension HTTPClient {
     func sendRequest<T: Decodable>(
         endpoint: Endpoint,
-        responseModel: T.Type
+        responseModel: T.Type,
+        decoder: ((Data) -> String?)? = nil
     ) async -> Result<T, RequestError> {
         
         guard let request = endpoint.request else {
@@ -151,14 +152,20 @@ public extension HTTPClient {
                     return .failure(.decode)
                 }
                 return .success(decodedResponse)
+                
             case 401:
                 return .failure(.unauthorized)
+                
             default:
+                Log.shared.Debug(msg: "HTTP Error \(response.statusCode)", detail: "\(response)")
                 var errorStr = String(data: data, encoding: .utf8) ?? ""
-                if let errorObj = try? JSONDecoder().decode(ErrorObject.self, from: data) {
+                
+                if let decoder, let msg = decoder(data) {
+                    errorStr = msg
+                } else if let errorObj = try? JSONDecoder().decode(ErrorObject.self, from: data) {
                     errorStr = "\(errorObj.message)\n(\(errorObj.id ?? "No ID"))"
                 }
-                Log.shared.Debug(msg: "HTTP Error \(response.statusCode)", detail: "\(response)")
+                
                 return .failure(.statusCode("\(HTTPURLResponse.localizedString(forStatusCode: response.statusCode).capitalized)\n \(errorStr)"))
             }
         } catch {

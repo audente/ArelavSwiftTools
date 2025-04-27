@@ -13,7 +13,7 @@ struct ContentView: View {
             Text("Hello, \(name)!")
             Button("Change") {
                 name = "there"
-                var logger = Log.shared
+                let logger = Log.shared
                 logger.logLevel = .Debug
                 logger.Debug(msg: "Hi")
             }
