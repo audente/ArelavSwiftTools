@@ -25,7 +25,7 @@ public enum RequestError: Error {
     case statusCode(String)
     case unknown(String)
     
-    var customMessage: String {
+    public var customMessage: String {
         switch self {
         case .invalidURL:
             return "Invalid URL configuration"

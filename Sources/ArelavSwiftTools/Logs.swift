@@ -1,7 +1,7 @@
 import Foundation
 
 
-public struct Log {
+public class Log {
     public func Debug(msg: String, detail: String? = nil) { 
         log(level: LogLevel.Debug.rawValue, type: "DBG", msg: msg, detail: detail) 
     }
